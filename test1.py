@@ -95,22 +95,23 @@ def search_fingerprint():
             print("Fingerprint matched!")
             return fingerprint_id
 
-    print("Fingerprint not found.")
     return None
 
 
 while True:
     command = input("Enter 'enroll' to enroll, 'search' to find, or 'exit' to quit: ").strip().lower()
-    if command == "enroll":
+    if command == "1":
         if enroll_fingerprint():
             print("Enrollment successful.")
-    elif command == "search":
+    elif command == "2":
         s_finger = search_fingerprint()
         if s_finger != None:
             print(f"Fingerprint found in database with ID {s_finger}.")
         else:
             print("Fingerprint not found.")
-    elif command == "exit":
+    elif command == "3":
+        cursor.execute("SELECT id, template FROM fingerprints")
+    elif command == "0":
         break
 
 # Close the database connection
