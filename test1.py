@@ -1,64 +1,13 @@
 import serial
 import adafruit_fingerprint
-import sqlite3
-import base64
 
 # Initialize UART connection
 uart = serial.Serial("/dev/ttyS1", baudrate=57600, timeout=1)
 finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
 
-# Initialize SQLite Database
-conn = sqlite3.connect("fingerprint.db")
-cursor = conn.cursor()
-
-# Create a table to store fingerprints
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS fingerprints (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    template BLOB NOT NULL
-)
-""")
-conn.commit()
-
 def enroll_fingerprint():
-    """Enroll a fingerprint and store it in the database."""
-    print("Place your finger on the sensor...")
-
-    # Step 1: Capture the fingerprint image
-    if finger.get_image() != adafruit_fingerprint.OK:
-        print("Failed to capture fingerprint image.")
-        return False
-
-    # Step 2: Convert image to a template
-    if finger.image_2_tz(1) != adafruit_fingerprint.OK:
-        print("Failed to convert image to template.")
-        return False
-
-    # Step 3: Store the template in the sensor
-    if finger.store_model(1) != adafruit_fingerprint.OK:
-        print("Failed to store fingerprint in sensor.")
-        return False
-
-    # Step 4: Retrieve the template data from the sensor
-    template_packet = finger.get_fpdata(sensorbuffer="char")
-    if not template_packet:
-        print("Failed to retrieve the fingerprint template.")
-        return False
-
-    # Convert the template packet to bytes for storage
-    template_bytes = bytes(template_packet)
-
-    # Encode the binary data as Base64
-    template_base64 = base64.b64encode(template_bytes).decode("utf-8")
-
-    # Insert the encoded template into the SQLite database
-    cursor.execute("INSERT INTO fingerprints (template) VALUES (?)", (template_base64,))
-    conn.commit()
-
-    print("Fingerprint enrolled successfully.")
-    print(template_base64)
-
-    return True
+    finger_test = finger.get_image()
+    print(finger_test)
 
 def search_fingerprint():
     """Search for a matching fingerprint in the database."""
