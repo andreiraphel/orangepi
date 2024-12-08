@@ -82,8 +82,6 @@ def search_fingerprint():
     # Convert the packet to bytes
     new_template_bytes = bytes(new_template_packet)
 
-    new_template_base64 = base64.b64encode(new_template_bytes).decode("utf-8")
-
     # Step 3: Fetch all stored fingerprints from the database
     cursor.execute("SELECT id, template FROM fingerprints")
     fingerprints = cursor.fetchall()
@@ -91,13 +89,15 @@ def search_fingerprint():
     for fingerprint_id, template_base64 in fingerprints:
         # Decode the stored template from Base64
         stored_template_bytes = base64.b64decode(template_base64)
-        stored_template_packet = list(stored_template_bytes)
 
-        if stored_template_bytes == new_template_base64:
-            print("Fingerprint found!")
+        # Compare the stored template with the newly captured template
+        if stored_template_bytes == new_template_bytes:
+            print("Fingerprint matched!")
             return fingerprint_id
-        
+
+    print("Fingerprint not found.")
     return None
+
 
 while True:
     command = input("Enter 'enroll' to enroll, 'search' to find, or 'exit' to quit: ").strip().lower()
