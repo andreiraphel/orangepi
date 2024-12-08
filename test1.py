@@ -1,27 +1,66 @@
 import serial
 import adafruit_fingerprint
+import sqlite3
+import base64
 
 # Initialize UART connection
 uart = serial.Serial("/dev/ttyS1", baudrate=57600, timeout=1)
-
-# Create a fingerprint sensor object
 finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
 
-# Check if the sensor is working
-if finger.read_templates() == adafruit_fingerprint.OK:
-    print(f"Fingerprint templates available: {finger.templates}")
-else:
-    print("Failed to read templates from AS608!")
+# Initialize SQLite Database
+conn = sqlite3.connect("fingerprint.db")
+cursor = conn.cursor()
 
-# Add more functionality, like enrolling or searching fingerprints
-def get_fingerprint_count():
-    if finger.count_templates() == adafruit_fingerprint.OK:
-        print(f"Fingerprints stored: {finger.template_count}")
-    else:
-        print("Failed to get fingerprint count.")
+# Create a table to store fingerprints
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS fingerprints (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    template BLOB NOT NULL
+)
+""")
+conn.commit()
 
 def enroll_fingerprint():
-    return finger.get_image()
+    """Enroll a fingerprint and store it in the database."""
+    print("Place your finger on the sensor...")
+    
+    if finger.get_image() != adafruit_fingerprint.OK:
+        print("Failed to capture fingerprint image.")
+        return
+    
+    if finger.image_2_tz(1) != adafruit_fingerprint.OK:
+        print("Failed to convert image to template.")
+        return
+    
+    # Save the fingerprint template in the sensor
+    if finger.store_model(1) != adafruit_fingerprint.OK:
+        print("Failed to store fingerprint in sensor.")
+        return
+    
+    # Retrieve the template from the sensor
+    if finger.load_model(1) != adafruit_fingerprint.OK:
+        print("Failed to load fingerprint model from sensor.")
+        return
+
+    packet = finger.get_fpdata(sensorbuffer="char")
+    if not packet:
+        print("Failed to get fingerprint data.")
+        return
+    
+    # Convert the binary data to base64 for storage
+    template_base64 = base64.b64encode(packet).decode("utf-8")
+    
+    # Insert into the SQL database
+    cursor.execute("INSERT INTO fingerprints (template) VALUES (?)", (template_base64,))
+    conn.commit()
+    print("Fingerprint enrolled and saved in the database.")
 
 while True:
-    print(enroll_fingerprint())
+    command = input("Enter 'enroll' to enroll a fingerprint or 'exit' to quit: ").strip().lower()
+    if command == "enroll":
+        enroll_fingerprint()
+    elif command == "exit":
+        break
+
+# Close the database connection
+conn.close()
