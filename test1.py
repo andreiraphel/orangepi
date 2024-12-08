@@ -20,4 +20,8 @@ def get_fingerprint_count():
     else:
         print("Failed to get fingerprint count.")
 
-get_fingerprint_count()
+def enroll_fingerprint():
+    return finger.get_image()
+
+while True:
+    print(enroll_fingerprint())
