@@ -99,7 +99,7 @@ def search_fingerprint():
 
 
 while True:
-    command = input("Enter 'enroll' to enroll, 'search' to find, or 'exit' to quit: ").strip().lower()
+    command = input("Enter '1' to enroll, '2' to find, '3' - database,  or '0' to quit: ").strip().lower()
     if command == "1":
         if enroll_fingerprint():
             print("Enrollment successful.")
@@ -110,7 +110,7 @@ while True:
         else:
             print("Fingerprint not found.")
     elif command == "3":
-        cursor.execute("SELECT id, template FROM fingerprints")
+       print(cursor.execute("SELECT id, template FROM fingerprints"))
     elif command == "0":
         break
 
