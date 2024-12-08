@@ -63,6 +63,7 @@ def search_fingerprint():
     """Search for a matching fingerprint in the database."""
     print("Place your finger on the sensor for matching...")
     
+    # Capture the new fingerprint
     if finger.get_image() != adafruit_fingerprint.OK:
         print("Failed to capture fingerprint image.")
         return None
@@ -71,32 +72,41 @@ def search_fingerprint():
         print("Failed to convert image to template.")
         return None
     
-    # Retrieve the new template
-    new_packet = finger.get_fpdata(sensorbuffer="char")
-    if not new_packet:
-        print("Failed to get fingerprint data.")
+    # Retrieve the new template data
+    new_template_packet = finger.get_fpdata(sensorbuffer="char")
+    if not new_template_packet:
+        print("Failed to retrieve the new fingerprint data.")
         return None
 
-    new_template_bytes = bytes(new_packet)
+    new_template_bytes = bytes(new_template_packet)
     
-    # Fetch all stored fingerprints
+    # Fetch all stored templates from the database
     cursor.execute("SELECT id, template FROM fingerprints")
     fingerprints = cursor.fetchall()
     
     for fingerprint_id, template_base64 in fingerprints:
-        # Decode the stored template
+        # Decode the stored template from Base64
         stored_template_bytes = base64.b64decode(template_base64)
         
-        # Send the stored template to the sensor for matching
-        if finger.send_fpdata(list(stored_template_bytes), sensorbuffer="char") != adafruit_fingerprint.OK:
-            print(f"Failed to send template for fingerprint ID {fingerprint_id}.")
+        # Convert stored template bytes back to a list of integers
+        stored_template_packet = list(stored_template_bytes)
+        
+        # Send the stored template to the sensor for comparison
+        if finger.send_fpdata(stored_template_packet, sensorbuffer="char") != adafruit_fingerprint.OK:
+            print(f"Failed to send stored template for fingerprint ID {fingerprint_id}.")
             continue
         
-        # Match with the new template
-        if finger.template_2_compare() == adafruit_fingerprint.OK:
+        # Compare with the new template
+        match_result = finger.template_2_compare()
+        if match_result == adafruit_fingerprint.OK:
             print(f"Fingerprint matched with ID {fingerprint_id}.")
             return fingerprint_id
-
+        elif match_result == adafruit_fingerprint.NOMATCH:
+            print(f"No match for fingerprint ID {fingerprint_id}.")
+            continue
+        else:
+            print(f"Error comparing fingerprint ID {fingerprint_id}.")
+    
     print("No matching fingerprint found.")
     return None
 
