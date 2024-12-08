@@ -111,6 +111,7 @@ while True:
             print("Fingerprint not found.")
     elif command == "3":
        print(cursor.execute("SELECT id, template FROM fingerprints"))
+       print(cursor.fetchall())
     elif command == "0":
         break
 
