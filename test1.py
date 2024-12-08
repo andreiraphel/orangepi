@@ -105,9 +105,9 @@ while True:
         if enroll_fingerprint():
             print("Enrollment successful.")
     elif command == "search":
-        match = search_fingerprint()
-        if match:
-            print(f"Fingerprint found in database with ID {match}.")
+        s_finger = search_fingerprint()
+        if s_finger != None:
+            print(f"Fingerprint found in database with ID {s_finger}.")
         else:
             print("Fingerprint not found.")
     elif command == "exit":
