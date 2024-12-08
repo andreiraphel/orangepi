@@ -57,6 +57,7 @@ def enroll_fingerprint():
 
     print("Fingerprint enrolled successfully.")
     print(template_base64)
+
     return True
 
 def search_fingerprint():
@@ -81,6 +82,8 @@ def search_fingerprint():
     # Convert the packet to bytes
     new_template_bytes = bytes(new_template_packet)
 
+    new_template_base64 = base64.b64encode(new_template_bytes).decode("utf-8")
+
     # Step 3: Fetch all stored fingerprints from the database
     cursor.execute("SELECT id, template FROM fingerprints")
     fingerprints = cursor.fetchall()
@@ -90,22 +93,10 @@ def search_fingerprint():
         stored_template_bytes = base64.b64decode(template_base64)
         stored_template_packet = list(stored_template_bytes)
 
-        # Send the stored template to the sensor for comparison
-        if finger.send_fpdata(stored_template_packet, sensorbuffer="char") != adafruit_fingerprint.OK:
-            print(f"Failed to send stored template for fingerprint ID {fingerprint_id}.")
-            continue
-
-        # Compare with the new template
-        match_result = finger.template_2_compare()
-        if match_result == adafruit_fingerprint.OK:
-            print(f"Fingerprint matched with ID {fingerprint_id}.")
+        if stored_template_bytes == new_template_base64:
+            print("Fingerprint found!")
             return fingerprint_id
-        elif match_result == adafruit_fingerprint.NOMATCH:
-            continue
-        else:
-            print(f"Error comparing fingerprint ID {fingerprint_id}.")
-
-    print("No matching fingerprint found.")
+        
     return None
 
 while True:
