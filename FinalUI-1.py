@@ -1,5 +1,6 @@
 import tkinter as tk
 import asyncio
+import threading
 import serial
 import adafruit_fingerprint
 
@@ -148,119 +149,119 @@ def find_empty_slot():
 async def enroll_fingerprint():
     global enroll_main_text
     enroll_main_text = "Place your finger on the sensor..."
-    enroll_main.config(text=enroll_main_text)
-    enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+    root.after(0, enroll_main.config, text=enroll_main_text)
+    root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
     await asyncio.sleep(2)
-    enroll_main.place_forget()
-
+    root.after(0, enroll_main.place_forget)
+    
     if finger.get_image() != adafruit_fingerprint.OK:
         enroll_main_text = "Fingerprint not detected. Please try again."
-        enroll_main.config(text=enroll_main_text)
-        enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, enroll_main.config, text=enroll_main_text)
+        root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        enroll_main.place_forget()
+        root.after(0, enroll_main.place_forget)
         return
     
     if finger.image_2_tz(1) != adafruit_fingerprint.OK:
         enroll_main_text = "Error processing fingerprint. Please try again."
-        enroll_main.config(text=enroll_main_text)
-        enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, enroll_main.config, text=enroll_main_text)
+        root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        enroll_main.place_forget()
+        root.after(0, enroll_main.place_forget)
         return
     
     enroll_main_text = "Remove your finger and place it again."
-    enroll_main.config(text=enroll_main_text)
-    enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+    root.after(0, enroll_main.config, text=enroll_main_text)
+    root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
     await asyncio.sleep(2)
-    enroll_main.place_forget()
+    root.after(0, enroll_main.place_forget())
     
     if finger.get_image() != adafruit_fingerprint.OK:
         enroll_main_text = "Fingerprint not detected the second time. Please try again."
-        enroll_main.config(text=enroll_main_text)
-        enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, enroll_main.config, text=enroll_main_text)
+        root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        enroll_main.place_forget()
+        root.after(0, enroll_main.place_forget())
         return
     
     if finger.image_2_tz(2) != adafruit_fingerprint.OK:
         enroll_main_text = "Error processing fingerprint the second time. Please try again."
-        enroll_main.config(text=enroll_main_text)
-        enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, enroll_main.config, text=enroll_main_text)
+        root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        enroll_main.place_forget()
+        root.after(0, enroll_main.place_forget())
         return
 
     if finger.create_model() != adafruit_fingerprint.OK:
         enroll_main_text = "Failed to create a fingerprint model."
-        enroll_main.config(text=enroll_main_text)
-        enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, enroll_main.config, text=enroll_main_text)
+        root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        enroll_main.place_forget()
+        root.after(0, enroll_main.place_forget())
         return
 
     position = find_empty_slot()
     if position is None:
         enroll_main_text = "No available slots for new fingerprints."
-        enroll_main.config(text=enroll_main_text)
-        enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, enroll_main.config, text=enroll_main_text)
+        root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        enroll_main.place_forget()
+        root.after(0, enroll_main.place_forget())
         return
 
     if finger.store_model(position) == adafruit_fingerprint.OK:
         enroll_main_text = f"Fingerprint successfully enrolled at position {position}."
-        enroll_main.config(text=enroll_main_text)
-        enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, enroll_main.config, text=enroll_main_text)
+        root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        enroll_main.place_forget()
+        root.after(0, enroll_main.place_forget())
         return
     
     enroll_main_text = "Failed to store fingerprint."
-    enroll_main.config(text=enroll_main_text)
-    enroll_main.place(relx=0.5, rely=0.5, anchor="center")
+    root.after(0, enroll_main.config, text=enroll_main_text)
+    root.after(0, enroll_main.place, relx=0.5, rely=0.5, anchor="center")
     await asyncio.sleep(2)
-    enroll_main.place_forget()
+    root.after(0, enroll_main.place_forget())
     return
 
 """Search for a fingerprint."""
 async def search_fingerprint():
     global scan_main_text
     scan_main_text = "Place your finger on the sensor..."
-    scan_main.config(text=scan_main_text)
-    scan_main.place(relx=0.5, rely=0.5, anchor="center")
+    root.after(0, scan_main.config, text=scan_main_text)
+    root.after(0, scan_main.place, relx=0.5, rely=0.5, anchor="center")
     await asyncio.sleep(2)
-    scan_main.place_forget()
+    root.after(0, scan_main.place_forget())
     
     if finger.get_image() != adafruit_fingerprint.OK:
         scan_main_text = "Fingerprint not detected."
-        scan_main.config(text=scan_main_text)
-        scan_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, scan_main.config, text=scan_main_text)
+        root.after(0, scan_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        scan_main.place_forget()    
+        root.after(0, scan_main.place_forget())    
         return None
     
     if finger.image_2_tz(1) != adafruit_fingerprint.OK:
         scan_main_text = "Error processing fingerprint."
-        scan_main.config(text=scan_main_text)
-        scan_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, scan_main.config, text=scan_main_text)
+        root.after(0, scan_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        scan_main.place_forget()
+        root.after(0, scan_main.place_forget())
         return None
 
     if finger.finger_fast_search() == adafruit_fingerprint.OK:
         scan_main_text = f"Fingerprint found! ID: {finger.finger_id}, Confidence: {finger.confidence}"
-        scan_main.config(text=scan_main_text)
-        scan_main.place(relx=0.5, rely=0.5, anchor="center")
+        root.after(0, scan_main.config, text=scan_main_text)
+        root.after(0, scan_main.place, relx=0.5, rely=0.5, anchor="center")
         await asyncio.sleep(2)
-        scan_main.place_forget()
+        root.after(0, scan_main.place_forget())
         return finger.finger_id
     
     scan_main_text = "No match found."
-    scan_main.config(text=scan_main_text)
-    scan_main.place(relx=0.5, rely=0.5, anchor="center")
+    root.after(0, scan_main.config, text=scan_main_text)
+    root.after(0, scan_main.place, relx=0.5, rely=0.5, anchor="center")
     await asyncio.sleep(2)
-    scan_main.place_forget()
+    root.after(0, scan_main.place_forget())
     return None
 
 """Delete a fingerprint by its ID."""
@@ -279,10 +280,22 @@ def list_fingerprints():
     else:
         print("Failed to read templates.")
 
-# Function to run async functions
+# Function to run async functions in the asyncio loop
 def run_async(async_func):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(async_func())
+    asyncio.run_coroutine_threadsafe(async_func(), loop)
+
+# Start the asyncio loop in a separate thread
+loop = asyncio.new_event_loop()
+asyncio_thread = threading.Thread(target=run_asyncio_loop, args=(loop,))
+asyncio_thread.start()
+
+# Define the closing protocol
+def on_closing():
+    loop.call_soon_threadsafe(loop.stop)
+    asyncio_thread.join()
+    root.destroy()
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Functions to manage UI pages
 def clear():
