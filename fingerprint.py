@@ -1,5 +1,5 @@
 import serial
-import adafruit_fingerprintp
+import adafruit_fingerprint
 
 # Initialize UART connection
 uart = serial.Serial("/dev/ttyS1", baudrate=57600, timeout=1)
